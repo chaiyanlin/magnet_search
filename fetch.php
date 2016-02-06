@@ -1,6 +1,6 @@
 <?php
-require('./Snoopy.php');
-require('./simple_html_dom.php');
+require_once('Snoopy.php');
+require_once('simple_html_dom.php');
 
 //###基础函数
 function get_title($item) {
