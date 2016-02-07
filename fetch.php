@@ -19,7 +19,9 @@ function get_magnent_url($item) {
 
 function get_size($item) {
 	$size_str = $item->find('div[class=item-detail]', 0)->find('span', 2)->innertext();
-	return preg_replace('/[<b>|<\/b>]/i', '', $size_str);
+	$size_str = preg_replace('/[<b>|<\/b>]/i', '', $size_str);
+	$size_str = split(':', $size_str)[1];
+	return $size_str;
 }
 
 function decode_uri_component($str) {
@@ -42,7 +44,7 @@ function get_parameter($argv) {
 	return $argv;
 }
 
-function trace( $input ) {
+function trace( $input, $file = null ) {
 	if ( is_string($input) ) {
 		$str = $input.PHP_EOL;
 	}
@@ -50,7 +52,8 @@ function trace( $input ) {
 		$str = print_r($input, true);
 	}
 	echo $str;
-	file_put_contents('result.out', $str, FILE_APPEND);
+	if ( !empty($file) )
+		file_put_contents($file, $str, FILE_APPEND);
 }
 //###
 
@@ -59,14 +62,18 @@ function trace( $input ) {
 $codes = get_parameter($argv);
 
 //清除上次执行产生的文件
-if ( file_exists('result.out') )
-	unlink('result.out');
+if ( file_exists('captured.json') )
+	unlink('captured.json');
 
 $url = 'http://www.btlibrary.net';
 trace('查询开始...');
+
+$captured = array();
+
 foreach ( $codes as $code ) {
 	trace('正在搜索关键字：' . $code . ' >>>>>');
 	$data = array('s'=> $code);
+	$captured[$code] = array();
 
 	$snoopy = new Snoopy();
 	$snoopy->submit($url, $data);
@@ -81,6 +88,7 @@ foreach ( $codes as $code ) {
 	    $title   = get_title($item);
 	    $size    = get_size($item);
 	    $magnent = get_magnent_url($item);
+	    $captured[$code][] = compact('title', 'size', 'magnent');
   	    trace('{');
 	    trace('title: ' . $title);
 	    trace('size: ' . $size);
@@ -89,4 +97,5 @@ foreach ( $codes as $code ) {
 	}
 	trace('<<<<<' . PHP_EOL . PHP_EOL . PHP_EOL);
 }
+trace(json_encode($captured, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT), 'captured.json');
 trace('查询结束...');
