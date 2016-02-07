@@ -50,12 +50,18 @@ function trace( $input ) {
 		$str = print_r($input, true);
 	}
 	echo $str;
+	file_put_contents('result.out', $str, FILE_APPEND);
 }
 //###
 
 
 //执行开始
 $codes = get_parameter($argv);
+
+//清除上次执行产生的文件
+if ( file_exists('result.out') )
+	unlink('result.out');
+
 $url = 'http://www.btlibrary.net';
 trace('查询开始...');
 foreach ( $codes as $code ) {
