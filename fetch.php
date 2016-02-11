@@ -60,10 +60,11 @@ function trace( $input, $file = null ) {
 
 //执行开始
 $codes = get_parameter($argv);
+$dir = dirname(__FILE__);
 
 //清除上次执行产生的文件
-if ( file_exists('captured.json') )
-	unlink('captured.json');
+if ( file_exists( $dir . '/captured.json') )
+	unlink( $dir . '/captured.json');
 
 $url = 'http://www.btlibrary.net';
 trace('查询开始...');
@@ -97,5 +98,5 @@ foreach ( $codes as $code ) {
 	}
 	trace('<<<<<' . PHP_EOL . PHP_EOL . PHP_EOL);
 }
-trace(json_encode($captured, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT), 'captured.json');
+trace(json_encode($captured, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT), $dir . '/captured.json');
 trace('查询结束...');
